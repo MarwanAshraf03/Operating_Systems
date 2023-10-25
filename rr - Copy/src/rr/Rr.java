@@ -6,12 +6,12 @@ public class Rr {
     public static void main(String[] args) {
         // pre-defining our process that will enter the queues to be able to monitor them
        process[] tasks = {new process("p1",0,7),new process("p2",1,4),new process("p3",2,15),
-       new process("p4",3,11),new process("p5",4,20),new process("p6",4,9)};
+       new process("p4",3,11),new process("p5",4,20),new process("p6",30,9)};
        // counter for how many tasks arrived already
        int added = 0;
        
        // the time quantum for each queue
-       int[] qt = {4,8,16};
+       int[] qt = {5,10,15};
        // counter to keep track of the current time
        int t = 0;
        
@@ -19,7 +19,7 @@ public class Rr {
        Queue[]q = {new LinkedList<>(),new LinkedList<>(),new LinkedList<>()};
        
        // we will keep processing untill no new tasks arrive and all queues are emtpy
-       while(added!=tasks.length | q[0].size()!=0 | q[1].size()!=0 | q[2].size()!=0){
+       while(added!=tasks.length | !queuesEmpty(q)){
            // check which tasks have arrived and add them in the first queue
            for(int i = added; i < tasks.length; i++){
                if(tasks[i].arrival_time<=t){
@@ -28,9 +28,7 @@ public class Rr {
                }
            }
            System.out.println("at time = "+t);
-           System.out.println(q[0]);
-           System.out.println(q[1]);
-           System.out.println(q[2]);
+           printQueues(q);
            
            // looping each queue to process the first task in the highest priority one
            for(int i = 0 ; i < q.length ; i++){
@@ -54,9 +52,7 @@ public class Rr {
            System.out.println("----------------------------");
        }
            System.out.println("at time = "+t);
-           System.out.println(q[0]);
-           System.out.println(q[1]);
-           System.out.println(q[2]);
+           printQueues(q);
            
            System.out.println("------waiting times-------");
            int total = 0;
@@ -66,5 +62,19 @@ public class Rr {
                System.out.println(tasks[i].id + ": " + wt);
            }
            System.out.println("average waiting time: "+total/tasks.length);
+    }
+    public static void printQueues(Queue[]q){
+        for(int i = 0 ; i < q.length ; i++){
+            System.out.println(q[i]);
+        }
+    }
+    
+    public static boolean queuesEmpty(Queue[]q){
+        for(int i = 0 ; i < q.length ; i++){
+            if(q[i].size()!=0){
+                return false;
+            }
+        }
+        return true;
     }
 }
