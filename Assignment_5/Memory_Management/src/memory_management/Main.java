@@ -15,14 +15,15 @@ package memory_management;
  * size_os: size of the operating system to calculate logical addresses
  * number_of_pages: number of pages without using the space of the
  *  operating system
- * address_page: addresses of the pages
+ * pages: array of pages
  */
 
 public class Main {
 public static void main(String[] args) {
         int page_fault = 0;
         int timer = -1;
-        final double size_disk = 80000;
+        final double virtual_memory = 10000;
+        final double size_disk = 80000 - virtual_memory;
         final double size_back_store = 0.1 * size_disk;
         final double size_RAM = 2000;
         final double size_page = 4;
