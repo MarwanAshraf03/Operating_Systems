@@ -11,13 +11,25 @@ package memory_management;
  */
 
 public class page {
+    private int id;
     private int base;
     private int limit;
     private int valid;
     private int occubied_by;
     private int last_time_used;
 
+    public page(int id, int base, int size_page){
+        this.id = id;
+        this.base = base;
+        this.limit = this.base + size_page;
+        this.valid = 1;
+        this.occubied_by = -1;
+        this.last_time_used = 0;
+    }
 
+    public int id_getter(){
+        return this.id;
+    }
     public int base_getter(){
         return this.base;
     }
