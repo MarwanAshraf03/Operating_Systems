@@ -57,13 +57,14 @@ class MemoryManagementUnit {
             for (Page page : physicalPageTable) {
                 if (page.getOccupiedBy() == process.getPid()) {
                     System.out.println("Page " + page.getId() + " allocated to Process " + process.getPid());
+                    lruQueue.addLast(page);
                 }
             }
             return;
         }
         if (requiredPages > 0) {
-            ArrayList<Integer> physicalSwapPages = new ArrayList<Integer>();
-            ArrayList<Integer> virtualSwapPages = new ArrayList<Integer>();
+            ArrayList<Page> physicalSwapPages = new ArrayList<Page>();
+            ArrayList<Page> virtualSwapPages = new ArrayList<Page>();
             // If there are more pages to allocate than available, perform LRU page replacement
             while (requiredPages > 0 && lruQueue.size() > 0) {
             // while (temp > 0 && lruQueue.size() > 0) {
@@ -71,7 +72,7 @@ class MemoryManagementUnit {
                 int pid = leastRecentlyUsed.getOccupiedBy();
                 for (int i = 0; i < numberOfPhysicalPages; i++) {
                     if (pid == physicalPageTable.get(i).getOccupiedBy()) {
-                        physicalSwapPages.add(i);
+                        physicalSwapPages.add(physicalPageTable.get(i));
                         requiredPages--;
                         if (requiredPages <= 0)
                             break;
@@ -82,7 +83,7 @@ class MemoryManagementUnit {
             for (int i = 0, j = physicalSwapPages.size(); i < numberOfVirtualPages && j > 0; i++) {
                 if (virtualPageTable.get(i).getOccupiedBy() == -1) {
                     System.out.format("%d, ", virtualPageTable.get(i).getId());
-                    virtualSwapPages.add(i);
+                    virtualSwapPages.add(virtualPageTable.get(i));
                     j--;
                 }
             }
@@ -93,14 +94,21 @@ class MemoryManagementUnit {
             for (int i = 0; i < physicalSwapPages.size(); i++) {
                 // System.out.println("Page " + leastRecentlyUsed.getId() + " replaced from and allocated to Process " + process.getPid());
                 try {
-                    System.out.format("Physical Page %d having process %d is replaced by Virtual Page %d having process %d\n", physicalPageTable.get(i).getId(), physicalPageTable.get(i).getOccupiedBy(), virtualPageTable.get(i).getId(), virtualPageTable.get(i).getOccupiedBy());
-                    swapIn_swapOut(physicalPageTable.get(i), virtualPageTable.get(i));
+                    System.out.format("Physical Page %d having process %d is replaced by Virtual Page %d having process %d\n", physicalSwapPages.get(i).getId(), physicalSwapPages.get(i).getOccupiedBy(), virtualSwapPages.get(i).getId(), virtualSwapPages.get(i).getOccupiedBy());
+                    swapIn_swapOut(physicalSwapPages.get(i), virtualSwapPages.get(i));
                     lruQueue.addLast(physicalPageTable.get(i));
                 } catch (IndexOutOfBoundsException e) {
                     System.out.println("No Enough Pages Neither in physical Nor in vertual memory");
                 }
             }
-
+            System.out.println("Physical pages: ");
+            for (Page page : physicalPageTable)
+                System.out.format("%d, ", page.getId());
+            System.out.println();
+            System.out.println("Virtual pages: ");
+            for (Page page : virtualPageTable)
+                System.out.format("%d, ", page.getId());
+            System.out.println();
             // Check for additional page faults
             if (requiredPages > 0) {
                 System.out.println("Page fault(s) occurred. Unable to allocate all required pages for Process " + process.getPid());

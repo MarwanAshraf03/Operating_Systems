@@ -5,10 +5,12 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        final double size_virtual_memory = 100;
+        // final double size_virtual_memory = 100;
+        final double size_virtual_memory = 50;
         // final double size_disk = 80000 - size_virtual_memory;
         // final double size_back_store = 0.1 * size_disk;
-        final double size_RAM = 200;
+        // final double size_RAM = 200;
+        final double size_RAM = 100;
         final double size_page = 4;
         final double size_os = 50;
         int numberOfVirtualPages = (int) (size_virtual_memory / size_page);
@@ -17,7 +19,7 @@ public class Main {
         ArrayList<Page> virtualPages = new ArrayList<Page>();
 
         // Initialize processes
-        ArrayList<Process> processes = createProcesses(100);
+        ArrayList<Process> processes = createProcesses(30);
         ArrayList<Process> arrivedProcesses = new ArrayList<Process>();
 
         for (int i = (int) size_os, j = 0; j < numberOfPhysicalPages; i += size_page, j++)
