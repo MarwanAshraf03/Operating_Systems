@@ -5,10 +5,10 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        final double size_virtual_memory = 10000;
+        final double size_virtual_memory = 100;
         final double size_disk = 80000 - size_virtual_memory;
         // final double size_back_store = 0.1 * size_disk;
-        final double size_RAM = 2000;
+        final double size_RAM = 200;
         final double size_page = 4;
         final double size_os = 50;
         int numberOfVirtualPages = (int) (size_virtual_memory / size_page);
@@ -17,7 +17,7 @@ public class Main {
         ArrayList<Page> virtualPages = new ArrayList<Page>();
 
         // Initialize processes
-        ArrayList<Process> processes = createProcesses(1000);
+        ArrayList<Process> processes = createProcesses(10);
         ArrayList<Process> arrivedProcesses = new ArrayList<Process>();
 
         for (int i = (int) size_os, j = 0; j < numberOfPhysicalPages; i += size_page, j++)
@@ -28,6 +28,7 @@ public class Main {
         MemoryManagementUnit mmu = new MemoryManagementUnit(physicalPages, numberOfPhysicalPages, virtualPages, numberOfVirtualPages, size_page);
 
         System.out.format("Number of physicalPages %d\n", numberOfPhysicalPages);
+        System.out.format("Number of virtualPages %d\n", numberOfVirtualPages);
         while (true) {
             System.out.format("\n*******At Time %d *******\n", ++Global.CLOCK);
             for (int i = 0; i < processes.size(); i++)
@@ -56,7 +57,8 @@ public class Main {
         for (int i = 1; i <= count; i++) {
             int arrivalTime = random.nextInt(10);
             int burstTime = random.nextInt(20) + 1;
-            double sizeNeeded = random.nextDouble() * 100;
+            // double sizeNeeded = random.nextDouble() * 20;
+            double sizeNeeded = 200;
 
             processes.add(new Process(i, arrivalTime, burstTime, sizeNeeded));
         }

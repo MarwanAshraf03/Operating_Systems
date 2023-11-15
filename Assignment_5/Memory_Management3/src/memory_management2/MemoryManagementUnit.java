@@ -8,7 +8,6 @@ class MemoryManagementUnit {
     private ArrayList<Page> physicalPageTable;
     private int numberOfVirtualPages;
     private ArrayList<Page> virtualPageTable;
-    // private LinkedList<Page> frames;
     private LinkedList<Page> lruQueue = new LinkedList<>();
     private int pageFaults = 0;
 
@@ -19,7 +18,6 @@ class MemoryManagementUnit {
         this.physicalPageTable = physicalPages; // Fixed: Assign the provided 'pages' to the 'physicalPageTable'
         this.virtualPageTable = virtualPageTable;
         this.numberOfVirtualPages = numberOfVirtualPages;
-        // this.frames = new LinkedList<>();
     }
 
      public void executeProcess(Process process) {
@@ -61,21 +59,23 @@ class MemoryManagementUnit {
                     pageFaults++;
                 }
             }
-            // for (int i = 0; i < numberOfPhysicalPages; i++) {
-            //     System.out.println(physicalSwapPages.get(i));
-            // }
-            // System.exit(0);
         }
-        for (int i = 0, j = numberOfPhysicalPages; i < numberOfVirtualPages && j > 0; i++)
-        if (virtualPageTable.get(i).getOccupiedBy() == -1) {
-            virtualSwapPages.add(i);
-            j--;
-        }
-        
-        for (int i = 0; i < numberOfPhysicalPages; i++) {
+        for (int i = 0, j = physicalSwapPages.size(); i < numberOfVirtualPages && j > 0; i++)
+            if (virtualPageTable.get(i).getOccupiedBy() == -1) {
+                virtualSwapPages.add(i);
+                j--;
+            }
+        // System.out.println("size of virtual swaps: " + virtualSwapPages);
+        // System.out.println("size of physical swaps: " + physicalSwapPages);
+        // System.exit(0);
+        for (int i = 0; i < physicalSwapPages.size(); i++) {
             // System.out.println("Page " + leastRecentlyUsed.getId() + " replaced from and allocated to Process " + process.getPid());
-            System.out.format("Physical Page %d having process %d is replaced by Virtual Page %d having process %d\n", physicalPageTable.get(i).getId(), physicalPageTable.get(i).getOccupiedBy(), virtualPageTable.get(i).getId(), virtualPageTable.get(i).getOccupiedBy());
-            swapIn_swapOut(physicalPageTable.get(i), virtualPageTable.get(i));
+            try {
+                System.out.format("Physical Page %d having process %d is replaced by Virtual Page %d having process %d\n", physicalPageTable.get(i).getId(), physicalPageTable.get(i).getOccupiedBy(), virtualPageTable.get(i).getId(), virtualPageTable.get(i).getOccupiedBy());
+                swapIn_swapOut(physicalPageTable.get(i), virtualPageTable.get(i));
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("No Enough Pages Neither in physical Nor in vertual memory");
+            }
         }
         
         // Check for additional page faults
