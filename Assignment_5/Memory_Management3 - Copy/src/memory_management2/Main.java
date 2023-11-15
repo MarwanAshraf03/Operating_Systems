@@ -5,11 +5,7 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        // final double size_virtual_memory = 100;
         final double size_virtual_memory = 50;
-        // final double size_disk = 80000 - size_virtual_memory;
-        // final double size_back_store = 0.1 * size_disk;
-        // final double size_RAM = 200;
         final double size_RAM = 100;
         final double size_page = 4;
         final double size_os = 50;
@@ -59,8 +55,6 @@ public class Main {
         for (int i = 1; i <= count; i++) {
             int arrivalTime = random.nextInt(10);
             int burstTime = random.nextInt(20) + 1;
-            // double sizeNeeded = random.nextDouble() * 20;
-            // double sizeNeeded = 200;
             double sizeNeeded = 4;
 
             processes.add(new Process(i, arrivalTime, burstTime, sizeNeeded));

@@ -1,7 +1,6 @@
 package memory_management2;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.lang.Integer;
 class MemoryManagementUnit {
     private double pageSize;
     private int numberOfPhysicalPages;
@@ -67,7 +66,6 @@ class MemoryManagementUnit {
             ArrayList<Page> virtualSwapPages = new ArrayList<Page>();
             // If there are more pages to allocate than available, perform LRU page replacement
             while (requiredPages > 0 && lruQueue.size() > 0) {
-            // while (temp > 0 && lruQueue.size() > 0) {
                 Page leastRecentlyUsed = lruQueue.removeFirst(); // Get the least recently used page
                 int pid = leastRecentlyUsed.getOccupiedBy();
                 for (int i = 0; i < numberOfPhysicalPages; i++) {
@@ -82,17 +80,12 @@ class MemoryManagementUnit {
             }
             for (int i = 0, j = physicalSwapPages.size(); i < numberOfVirtualPages && j > 0; i++) {
                 if (virtualPageTable.get(i).getOccupiedBy() == -1) {
-                    System.out.format("%d, ", virtualPageTable.get(i).getId());
                     virtualSwapPages.add(virtualPageTable.get(i));
                     j--;
                 }
             }
             System.out.println();
-            // System.out.println("size of virtual swaps: " + virtualSwapPages);
-            // System.out.println("size of physical swaps: " + physicalSwapPages);
-            // System.exit(0);
             for (int i = 0; i < physicalSwapPages.size(); i++) {
-                // System.out.println("Page " + leastRecentlyUsed.getId() + " replaced from and allocated to Process " + process.getPid());
                 try {
                     System.out.format("Physical Page %d having process %d is replaced by Virtual Page %d having process %d\n", physicalSwapPages.get(i).getId(), physicalSwapPages.get(i).getOccupiedBy(), virtualSwapPages.get(i).getId(), virtualSwapPages.get(i).getOccupiedBy());
                     swapIn_swapOut(physicalSwapPages.get(i), virtualSwapPages.get(i));
@@ -101,14 +94,6 @@ class MemoryManagementUnit {
                     System.out.println("No Enough Pages Neither in physical Nor in vertual memory");
                 }
             }
-            System.out.println("Physical pages: ");
-            for (Page page : physicalPageTable)
-                System.out.format("%d, ", page.getId());
-            System.out.println();
-            System.out.println("Virtual pages: ");
-            for (Page page : virtualPageTable)
-                System.out.format("%d, ", page.getId());
-            System.out.println();
             // Check for additional page faults
             if (requiredPages > 0) {
                 System.out.println("Page fault(s) occurred. Unable to allocate all required pages for Process " + process.getPid());
