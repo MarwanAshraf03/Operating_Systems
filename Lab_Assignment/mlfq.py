@@ -15,10 +15,10 @@ class P:
 def rr(q):
     # quantum time
     qt=3
-    # pop the first process in the queue
+    print(f't={time} --> {q[0].id} is executing')
     displayMLFQ(mlfq,time,q[0])
+    # pop the first process in the queue
     process = q.pop(0)
-    print(f't={time} --> {process.id} is executing')
     # we will enrcement time either with the quantum time or the process execution time left if it's shorter
     time_taken = min(qt,process.execution)
     chart.append((process.id,time))
@@ -38,9 +38,9 @@ def srt(q):
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
+    print(f't={time} --> {q[process].id} is executing')
     displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
-    print(f't={time} --> {process.id} is executing')
     time_taken = min(qt,process.execution)
     chart.append((process.id,time))
     process.execution-= time_taken
@@ -56,9 +56,9 @@ def sjn(q):
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
+    print(f't={time} --> {q[process].id} is executing')
     displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
-    print(f't={time} --> {process.id} is executing')
     time_taken = process.execution
     chart.append((process.id,time))
     process.execution-= time_taken
@@ -89,14 +89,30 @@ def displayMLFQ(mlfq,time,process):
     c.create_text(30,300,text='priority 2')
     for q in range(len(mlfq)):
         for p in range(len(mlfq[q])):
+            # vertical lines
+            # x1 = p * 30 + 10 --> starts before the process with 30 pixels difference between each line and displace them with 10 pixels so it doesn't stick to the borders
+            # y1 = (q + 1) * 100 + 30 --> start after the beginnig of the queue with 30 pixels
+            # x2 = x1 --> because it's a vertical line
+            # y2 = y1+30 --> give the line 30 pixels height
             c.create_line(p*30+10,(q+1)*100+30,p*30+10,(q+1)*100+60)
             if mlfq[q][p].id==process.id:
+                # process name
+                # x = vertical line before the process + 15 --> displace the process name by 15 pixels from the vertical line before it
+                # y = start of the queue + 15 --> same idea in x
+                # color the process that will enter the cpu in red
                 c.create_text(p*30+25,(q+1)*100+45,text=mlfq[q][p].id,fill='red')
             else:
                 c.create_text(p*30+25,(q+1)*100+45,text=mlfq[q][p].id)
             if(p==len(mlfq[q])-1):
+                # since the last process is missing the vertical line on the right we add this line
                 c.create_line((p+1)*30+10,(q+1)*100+30,(p+1)*30+10,(q+1)*100+60)
+                # 2 horizontal lines
+                # x1 = 10 --> the horizontal start of the first vertical line which is at 0 with 10 pixels displacement
+                # y1 --> the vertical start of all vertical lines
+                # x2 = --> the horizontal start of the last vertical line
+                # y2 --> same as y1 since it's a horizontal line
                 c.create_line(10,(q+1)*100+30,(p+1)*30+10,(q+1)*100+30)
+                # the second horizontal line is the same as the first one but positioned at the bottom of the vertical lines
                 c.create_line(10,(q+1)*100+60,(p+1)*30+10,(q+1)*100+60)
     c.create_text(150,400,text='*Process colored in red is the one that entered the cpu',fill='red')
     mainloop()
@@ -135,14 +151,28 @@ c = Canvas(tk,height=500,width=1500)
 c.configure(bg='white')
 c.pack()
 for p in range(len(chart)):
-    c.create_line((chart[p][1]*40)+10,220,(chart[p][1]*40)+10,280)
-    c.create_text((chart[p][1]*40)+10,290,text=chart[p][1])
+    # vertical lines:
+    # x1 = the start time of each execution and give the 1 unit time a width of 40 pixels and displace them all with 10 pixels
+    # y1 = the vertical start of the line
+    # x2 = x1 --> a vertical line
+    # y2 -->  this gives the lines a height of 60 pixels
+    c.create_line(chart[p][1]*40+10,220,(chart[p][1]*40)+10,280)
+    # time index
+    # x = the exact position of the vertical line
+    # y = after the end of the vertical line which is 280 by 10 pixels
+    c.create_text(chart[p][1]*40+10,290,text=chart[p][1])
     if p!=len(chart)-1:
+        # process name
+        # x --> the same position of the vertical line but we add half the distance between the start line and the end line to place the process name in the middle
         c.create_text(chart[p][1]*40+10+(chart[p+1][1]-chart[p][1])*20,252,text=chart[p][0])
     else:
+        # the same thing as the past line but the end here is the end time and not the next process's start because this was the last process
         c.create_text(chart[p][1]*40+10+(time-chart[p][1])*20,252,text=chart[p][0])
+
+# creating the last vertical line which lies at the end time and giving it its time index
 c.create_line(time*40+10,220,time*40+10,280)
 c.create_text(time*40+10,290,text=time)
+# the horizontal lines
 c.create_line(10,220,time*40+10,220)
 c.create_line(10,280,time*40+10,280)
 c.mainloop()
