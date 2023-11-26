@@ -1,4 +1,4 @@
-
+from tkinter import *
 class P:
     def __init__(self,id,arrival,execution,priority):
         self.id = id
@@ -16,10 +16,12 @@ def rr(q):
     # quantum time
     qt=3
     # pop the first process in the queue
+    displayMLFQ(mlfq,time,q[0])
     process = q.pop(0)
     print(f't={time} --> {process.id} is executing')
     # we will enrcement time either with the quantum time or the process execution time left if it's shorter
     time_taken = min(qt,process.execution)
+    chart.append((process.id,time))
     process.execution-= time_taken
     if(process.execution==0):
         print(f'{process.id} finished executing at time {time+time_taken}')
@@ -36,9 +38,11 @@ def srt(q):
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
+    displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
     print(f't={time} --> {process.id} is executing')
     time_taken = min(qt,process.execution)
+    chart.append((process.id,time))
     process.execution-= time_taken
     if(process.execution==0):
         print(f'{process.id} finished executing at time {time+time_taken}')
@@ -52,9 +56,11 @@ def sjn(q):
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
+    displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
     print(f't={time} --> {process.id} is executing')
     time_taken = process.execution
+    chart.append((process.id,time))
     process.execution-= time_taken
     print(f'{process.id} finished executing at time {time+time_taken}')
     process.waiting_time = time+time_taken-process.arrival-process.execution_time
@@ -72,9 +78,33 @@ def execute(q,priority):
         q,p,t= sjn(q)
         return (q,p,t)
 
+def displayMLFQ(mlfq,time,process):
+    tk = Tk()
+    c = Canvas(tk,width=500,height=500)
+    c.configure(bg='white')
+    c.pack()
+    c.create_text(50,30,text=f"At time = {time}")
+    c.create_text(30,100,text='priority 0')
+    c.create_text(30,200,text='priority 1')
+    c.create_text(30,300,text='priority 2')
+    for q in range(len(mlfq)):
+        for p in range(len(mlfq[q])):
+            c.create_line(p*30+10,(q+1)*100+30,p*30+10,(q+1)*100+60)
+            if mlfq[q][p].id==process.id:
+                c.create_text(p*30+25,(q+1)*100+45,text=mlfq[q][p].id,fill='red')
+            else:
+                c.create_text(p*30+25,(q+1)*100+45,text=mlfq[q][p].id)
+            if(p==len(mlfq[q])-1):
+                c.create_line((p+1)*30+10,(q+1)*100+30,(p+1)*30+10,(q+1)*100+60)
+                c.create_line(10,(q+1)*100+30,(p+1)*30+10,(q+1)*100+30)
+                c.create_line(10,(q+1)*100+60,(p+1)*30+10,(q+1)*100+60)
+    c.create_text(150,400,text='*Process colored in red is the one that entered the cpu',fill='red')
+    mainloop()
+
 # processes = [P('p0',0,10,0),P('p1',0,2,1),P('p2',0,4,0),P('p3',4,8,2),P('p4',5,10,1),P('p5',7,7,2)]
 processes = [P('p0',0,5,1),P('p1',1,8,0),P('p2',3,6,2),P('p3',5,4,2),P('p4',8,2,1),P('p5',16,10,0)]
 mlfq = [[],[],[]]
+chart=[]
 
 # c is a counter to how many process arrived so we don't duplicate them in the queue
 c = 0
@@ -99,3 +129,20 @@ for x in processes:
     print(f'w{x.id} = {x.waiting_time}')
     avg+=x.waiting_time
 print(f'average waiting time = {avg}/{len(processes)} = {avg/len(processes)}')
+
+tk = Tk()
+c = Canvas(tk,height=500,width=1500)
+c.configure(bg='white')
+c.pack()
+for p in range(len(chart)):
+    c.create_line((chart[p][1]*40)+10,220,(chart[p][1]*40)+10,280)
+    c.create_text((chart[p][1]*40)+10,290,text=chart[p][1])
+    if p!=len(chart)-1:
+        c.create_text(chart[p][1]*40+10+(chart[p+1][1]-chart[p][1])*20,252,text=chart[p][0])
+    else:
+        c.create_text(chart[p][1]*40+10+(time-chart[p][1])*20,252,text=chart[p][0])
+c.create_line(time*40+10,220,time*40+10,280)
+c.create_text(time*40+10,290,text=time)
+c.create_line(10,220,time*40+10,220)
+c.create_line(10,280,time*40+10,280)
+c.mainloop()
