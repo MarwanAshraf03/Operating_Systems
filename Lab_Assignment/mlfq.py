@@ -1,5 +1,6 @@
 from tkinter import *
 class P:
+    allocated_number=0
     def __init__(self,id,arrival,execution,priority):
         self.id = id
         self.arrival= arrival
@@ -8,6 +9,8 @@ class P:
         self.execution = execution
         self.execution_time = execution
         self.waiting_time = 0
+        # the next variable to make sure we don't add a process in the queues more than once by setting it to true when the process gets allocated
+        self.allocated=False
     def __str__(self):
         return f'pid:{self.id} -- arrival time:{self.arrival} -- execution time:{self.execution} -- priority:{self.priority}'
 
@@ -23,6 +26,7 @@ def rr(q):
     time_taken = min(qt,process.execution)
     chart.append((process.id,time))
     process.execution-= time_taken
+
     if(process.execution==0):
         print(f'{process.id} finished executing at time {time+time_taken}')
         process.waiting_time = time+time_taken-process.arrival-process.execution_time
@@ -32,18 +36,20 @@ def rr(q):
 
 def srt(q):
     qt = 2
-    # index of shortes process until we find something shorter
+    # index of shortest process until we find something shorter
     process = 0
     # locating the shortest process
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
     print(f't={time} --> {q[process].id} is executing')
+
     displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
     time_taken = min(qt,process.execution)
     chart.append((process.id,time))
     process.execution-= time_taken
+
     if(process.execution==0):
         print(f'{process.id} finished executing at time {time+time_taken}')
         process.waiting_time = time+time_taken-process.arrival-process.execution_time
@@ -56,12 +62,14 @@ def sjn(q):
     for x in range(len(q)):
         if(q[x].execution<q[process].execution):
             process=x
+
     print(f't={time} --> {q[process].id} is executing')
     displayMLFQ(mlfq,time,q[process])
     process = q.pop(process)
     time_taken = process.execution
     chart.append((process.id,time))
     process.execution-= time_taken
+    
     print(f'{process.id} finished executing at time {time+time_taken}')
     process.waiting_time = time+time_taken-process.arrival-process.execution_time
     return (q,process,time_taken)
@@ -80,8 +88,11 @@ def execute(q,priority):
 
 def displayMLFQ(mlfq,time,process):
     tk = Tk()
-    c = Canvas(tk,width=500,height=500)
+    c = Canvas(tk,width=500,height=500,scrollregion=(0,0,P.allocated_number*30 + 10,P.allocated_number*30 + 10))
     c.configure(bg='white')
+    scrollbar = Scrollbar(tk, orient="horizontal", command=c.xview)
+    c.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="bottom", fill="x")
     c.pack()
     c.create_text(50,30,text=f"At time = {time}")
     c.create_text(30,100,text='priority 0')
@@ -117,21 +128,61 @@ def displayMLFQ(mlfq,time,process):
     c.create_text(150,400,text='*Process colored in red is the one that entered the cpu',fill='red')
     mainloop()
 
+def checkID():
+    while True:
+        Id = input('process name: ')
+        if Id not in namespace:
+            namespace.append(Id)
+            return Id
+        else:
+            print('process ID is duplicated')
+
+def checkTime(time):
+    while True:
+        t = int(input(f"{time} time: "))
+        if t>=0:
+            return t
+        else:
+            print("Time can't be a negative number")
+
+def checkPriority():
+    while True:
+        p = int(input('Priority: '))
+        if p>=0 and p<=2:
+            return p
+        else:
+            print('Priority must be between 0 and 2 (both ends included)')
 # processes = [P('p0',0,10,0),P('p1',0,2,1),P('p2',0,4,0),P('p3',4,8,2),P('p4',5,10,1),P('p5',7,7,2)]
-processes = [P('p0',0,5,1),P('p1',1,8,0),P('p2',3,6,2),P('p3',5,4,2),P('p4',8,2,1),P('p5',16,10,0)]
+# processes = [P('p0',0,5,1),P('p1',1,8,0),P('p2',3,6,2),P('p3',5,4,2),P('p4',8,2,1),P('p5',16,10,0)]
+processes = []
+namespace = []
+number_of_processes = 0
+while True:
+    number_of_processes = int(input('Enter number of processes: '))
+    if number_of_processes>0:
+        break
+    else:
+        print('Number of processes must be greate than zero')
+for x in range(number_of_processes):
+    Id = checkID()
+    arrival = checkTime('Arrival')
+    execution = checkTime('Execution')
+    priority = checkPriority()
+    processes.append(P(Id,arrival,execution,priority))
+
 mlfq = [[],[],[]]
 chart=[]
 
-# c is a counter to how many process arrived so we don't duplicate them in the queue
-c = 0
 time = 0
-while c<len(processes) or (len(mlfq[0]) != 0 or len(mlfq[1])!=0 or len(mlfq[2])!=0):
+while P.allocated_number<len(processes) or (len(mlfq[0]) != 0 or len(mlfq[1])!=0 or len(mlfq[2])!=0):
     # allocating the processes that arrived
-    for x in range(c,len(processes)):
+    for x in range(len(processes)):
         p = processes[x]
-        if(p.arrival<=time):
+        if(p.arrival<=time and p.allocated==False):
             mlfq[p.priority].append(p)
-            c+=1
+            print(f"At time {time} {p.id} arrived")
+            p.allocated=True
+            P.allocated_number+=1
     # executing the process when it's its turn
     for q in range(len(mlfq)):
         if len(mlfq[q]) != 0:
@@ -147,8 +198,11 @@ for x in processes:
 print(f'average waiting time = {avg}/{len(processes)} = {avg/len(processes)}')
 
 tk = Tk()
-c = Canvas(tk,height=500,width=1500)
+c = Canvas(tk,height=500,width=1500,scrollregion=(0,0,time*40+20,time*40+20))
 c.configure(bg='white')
+scrollbar = Scrollbar(tk, orient="horizontal", command=c.xview)
+c.config(yscrollcommand=scrollbar.set)
+scrollbar.pack(side="bottom", fill="x")
 c.pack()
 for p in range(len(chart)):
     # vertical lines:
