@@ -139,30 +139,44 @@ def checkID():
 
 def checkTime(time):
     while True:
-        t = int(input(f"{time} time: "))
-        if t>=0:
-            return t
-        else:
-            print("Time can't be a negative number")
+        try:
+            t = int(input(f"{time} time: "))
+            if t >= 0:
+                return t
+            else:
+                print("Time can't be a negative number")
+        except ValueError:
+            print("Please enter a valid integer for time.")
 
 def checkPriority():
     while True:
-        p = int(input('Priority: '))
-        if p>=0 and p<=2:
-            return p
-        else:
-            print('Priority must be between 0 and 2 (both ends included)')
+        try:
+            p = int(input('Priority: '))
+            if 0 <= p <= 2:
+                return p
+            else:
+                print('Priority must be between 0 and 2 (both ends included)')
+        except ValueError:
+            print("Please enter a valid integer for priority.")
+            
+def getNumberOfProcesses():
+    while True:
+        try:
+            num_processes = int(input('Enter number of processes: '))
+            if num_processes > 0:
+                return num_processes
+            else:
+                print('Number of processes must be greater than zero.')
+        except ValueError:
+            print('Please enter a valid integer for the number of processes.')
+            
 # processes = [P('p0',0,10,0),P('p1',0,2,1),P('p2',0,4,0),P('p3',4,8,2),P('p4',5,10,1),P('p5',7,7,2)]
 # processes = [P('p0',0,5,1),P('p1',1,8,0),P('p2',3,6,2),P('p3',5,4,2),P('p4',8,2,1),P('p5',16,10,0)]
 processes = []
 namespace = []
-number_of_processes = 0
-while True:
-    number_of_processes = int(input('Enter number of processes: '))
-    if number_of_processes>0:
-        break
-    else:
-        print('Number of processes must be greate than zero')
+
+number_of_processes = getNumberOfProcesses()
+
 for x in range(number_of_processes):
     Id = checkID()
     arrival = checkTime('Arrival')
