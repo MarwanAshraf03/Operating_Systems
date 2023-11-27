@@ -198,6 +198,7 @@ while P.allocated_number<len(processes) or (len(mlfq[0]) != 0 or len(mlfq[1])!=0
             p.allocated=True
             P.allocated_number+=1
     # executing the process when it's its turn
+    t = 1
     for q in range(len(mlfq)):
         if len(mlfq[q]) != 0:
             mlfq[q],process,t = execute(mlfq[q],q)
