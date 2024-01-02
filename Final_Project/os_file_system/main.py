@@ -27,6 +27,8 @@ if os.path.exists('file.json'):
         dict = json.load(f)
     root = tree(**dict['root'][0])
     root.load_system()
+    root.updateSize(root.parsePath('root'))
+
 else:
     root = tree()
 # we only have one main partition (linux-like)
@@ -43,33 +45,62 @@ while True:
         if root.isWritable(c):
             if c.type == 'directory':
                 name = input('Name: ')
-                root.addChild(c, leaf(name, 'directory', False))
+                if name.strip() == '':
+                    print("Name is not valid")
+                else:
+                    root.addChild(c, leaf(name, 'directory', False))
             else:
-                root.updateContent(c)
+                text = input('')
+                content = root.getContent(c)
+                # if root.updateSize(root.parsePath('root')) - (len(text) + len(content)) <= 0:
+                if root.updateSize(root.parsePath('root')) < (len(text) + len(content)):
+                    print("1**Memory Full**")
+                else:
+                    if content != '':
+                        content += f'\n{text}'
+                        root.updateContent(c, content)
+                    else:
+                        root.updateContent(c, text)
         else:
-            print('Access denied')
+            print('mk\nAccess denied')
 
     # creates file if we're in a directory and writes content if we're in a file
     if i == 'mkf':
         if root.isWritable(c):
             if c.type == 'directory':
                 name = input('Name: ')
-                root.addChild(c, leaf(name, parseType(name), False))
+                if name.strip() == '':
+                    print("Name is not valid")
+                else:
+                    root.addChild(c, leaf(name, parseType(name), False))
             else:
-                root.updateContent(c)
+                text = input('')
+                rs = root.updateSize(root.parsePath('root'))
+                # if root.updateSize(root.parsePath('root')) - len(text) < 0:
+                if (rs+len(root.getContent(c)) < len(text)) and (len(text) > len(root.getContent(c))):
+                    print("2**Memory Full**")
+                else:
+                    root.updateContent(c, text)
         else:
-            print('Access denied')
+            print('mkf\nAccess denied')
 
     if i == 'exit':
         break
 
     # lists current directory direct children
     if i == 'ls':
-        print(root.ls(c))
+        # print(root.ls(c))
+        if root.getAccess(c)[0] == 'r':
+            print(root.ls(c))
+        else:
+            print('ls\nAccess Denied')
 
     # lists all the tree
     if i == 'ls -a':
-        root.showTree(root.root)
+        if root.getAccess(root.parsePath('root'))[0] == 'r':
+            root.showTree(root.root)
+        else:
+            print('ls -a\nAccess Denied')
 
     # if the user entered a directory or file name in our current directory, we open it. we reset path so if an error happened the parsePath method returns the last available path
     if i in root.ls(c):
@@ -92,12 +123,22 @@ while True:
             print('Acess denied')
     
     # changes access, if it's no more writable we take a step back
-    if i == '-p':
+    if i == 'permission':
         root.changeAccess(c, input('New_Access: '))
         if c.access[0] == '-':
             path = path[:-len(c.name)-1]
             c = root.parsePath(path)
             path = c.path
+
+    # changes access, if it's no more writable we take a step back
+    if i == 'sudo permission':
+        password = input('Enter Super User Password: ')
+        if password == 'FBI':
+            root.changeAccess(c, input('New_Access: '))
+        # if c.access[0] == '-':
+        #     path = path[:-len(c.name)-1]
+        #     c = root.parsePath(path)
+        #     path = c.path
 
     # we take a temporary object from our copied, cut files
     if i in ['copy', 'cut']:
@@ -127,7 +168,5 @@ while True:
     if i == 'info':
         print(c)
 
-    if i == 'mm':
-        print(root)
-    
+    root.updateSize(root.parsePath('root'))
     root.submit()

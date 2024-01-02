@@ -33,6 +33,7 @@ class leaf:
 
         if Type == 'directory':
             self.children = []
+            self.size = 0
         else:
             self.content = ''
             self.size = 0
@@ -54,6 +55,7 @@ class leaf:
             if self.type == 'directory':
                 self.children = argv['children']
             self.partition = argv['part']
+            self.size = argv['size']
         if self.partition:
             self.size = 1001
             self.block = 13
@@ -64,6 +66,12 @@ class leaf:
         self.Id = math.ceil(random() * 9000)
         while self.Id in nameSpace:
             self.Id = math.ceil(random() * 9000)
+
+    def updateSize(self):
+        if self.type == 'directory':
+            self.size = 0
+            for i in self.children:
+                self.size += i.size
 
     """
     This is a function to change the object to a dictionary representation
@@ -79,7 +87,8 @@ class leaf:
                     "Modified": self.modifyTime,
                     "path": self.path,
                     "content": self.content,
-                    "part": self.partition
+                    "part": self.partition,
+                    "size": self.size
                 }
         elif self.type == 'directory':
             return {"Access": f"{self.access}",
@@ -91,14 +100,15 @@ class leaf:
                     "Modified": self.modifyTime,
                     "path": self.path,
                     "part": self.partition,
-                    "children": []
+                    "children": [],
+                    "size": self.size,
                 }
 
     # overwrite the print function
     def __str__(self):
-        if self.partition:
-            return f'ID: {self.Id} -- Name: {self.name} -- Size: {self.size}'
+        if self.type == 'directory':
+            return f'Acess: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
         elif self.type != 'directory':
-            return f'Access: {self.access} -- ID: {self.Id} -- Type: {self.type} -- Name: {self.name} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
-        else:
-            return f'ID: {self.Id} -- Name: {self.name} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
+            return f'Access: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Type: {self.type} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
+        elif self.partition:
+            return f'ID: {self.Id} -- Name: {self.name} -- Size: {self.size}'

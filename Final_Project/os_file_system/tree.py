@@ -18,6 +18,8 @@ class tree:
     def __init__(self, **dict):
         if dict:
             self.root = leaf(**dict)
+            # self.updateSize(self.root)
+            # print("update done")
         else:
             self.root = leaf('root', 'directory', True)
 
@@ -28,13 +30,14 @@ class tree:
             return
 
         # check if the user has permissions to write before creating file/folder
-        if Dir.access[1]!='w':
-            print('Access denied')
-            return
+        # if Dir.access[1]!='w':
+        #     print('addChild\nAccess denied')
+        #     return
 
         # changing the path of the new file to be present in the directory and creating it
         leaf.path = Dir.path + f'/{leaf.name}'
         Dir.children.append(leaf)
+        # Dir.size += leaf.size
 
     # check if the permissions are entered as read, write, execute. Also a user cannot write if they can't read the file
     def validAccess(self, a):
@@ -64,13 +67,15 @@ class tree:
         for x in path:
             # catch an error if the file/folder not found and returning the last available folder in the path
             try:
+                root = root.children[self.ls(root).index(x)]
+                root.accessTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 # check if we have the read permission before accessing the file/folder then change accessTime if you have the permission,  O.W return last available folder
-                if root.children[self.ls(root).index(x)].access[0] == 'r':
-                    root = root.children[self.ls(root).index(x)]
-                    root.accessTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                else:
-                    print('access denied')
-                    return root
+                # if root.children[self.ls(root).index(x)].access[0] == 'r':
+                #     root = root.children[self.ls(root).index(x)]
+                #     root.accessTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # else:
+                #     print('access denied')
+                #     return root
             except:
                 print('Invalid path')
                 return root
@@ -102,17 +107,23 @@ class tree:
 
 
     def delete(self, Dir, name):
-        # we chekc if write permission is granted and if the file exist in the directory. if so,  we remove the file and modifyTime in the directory
-        if Dir.access[1] == 'w':
-            if name in self.ls(Dir):
-                Dir.children.pop(self.ls(Dir).index(name))
-                Dir.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                print('File does not exist')
-                return
+        if name in self.ls(Dir):
+            Dir.children.pop(self.ls(Dir).index(name))
+            Dir.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         else:
-            print('Access denied')
+            print('File does not exist')
             return
+        # we chekc if write permission is granted and if the file exist in the directory. if so,  we remove the file and modifyTime in the directory
+        # if Dir.access[1] == 'w':
+        #     if name in self.ls(Dir):
+        #         Dir.children.pop(self.ls(Dir).index(name))
+        #         Dir.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        #     else:
+        #         print('File does not exist')
+        #         return
+        # else:
+        #     print('delete\nAccess denied')
+        #     return
 
     def changeAccess(self, file, access):
         # check again if the entered access is the way we parse it
@@ -121,6 +132,9 @@ class tree:
         else:
             print('Wrong access')
             return
+
+    def getAccess(self, file):
+        return file.access
 
     # pastes a copied object
     def copy(self, Dir, file):
@@ -172,10 +186,22 @@ class tree:
             # file.path = Dir.path+'/'+file.name
             self.updatePath(Dir,file,'cut')
 
+    def getContent(self, file):
+        return file.content
+
     #TODO incomplete, we need to properly adjust size
-    def updateContent(self, file):
-        file.content = input('')
+    def updateContent(self, file, text):
+        file.content = text
+        file.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.size = len(file.content)
+
+    def updateSize(self, root):
+        root.size = 1001
+        for i in root.children:
+            i.updateSize()
+            root.size -= i.size
+        return root.size
+
 
     #TODO we need to figure out the best way to calculate sizes of files,  directories,  partitions. Note that in partitions we have to calculate the remaining disk space
     def getSize(self, Dir):
