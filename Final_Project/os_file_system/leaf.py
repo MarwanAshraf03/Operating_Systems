@@ -57,7 +57,7 @@ class leaf:
             self.partition = argv['part']
             self.size = argv['size']
         if self.partition:
-            self.size = 1001
+            self.size = 0
             self.block = 13
 
         nameSpace.append(self.Id)
@@ -88,7 +88,7 @@ class leaf:
                     "path": self.path,
                     "content": self.content,
                     "part": self.partition,
-                    "size": self.size
+                    "used space": self.size
                 }
         elif self.type == 'directory':
             return {"Access": f"{self.access}",
@@ -101,7 +101,7 @@ class leaf:
                     "path": self.path,
                     "part": self.partition,
                     "children": [],
-                    "size": self.size,
+                    "used space": self.size,
                 }
 
     # overwrite the print function

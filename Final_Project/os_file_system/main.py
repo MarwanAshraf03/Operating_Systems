@@ -27,7 +27,7 @@ if os.path.exists('file.json'):
         dict = json.load(f)
     root = tree(**dict['root'][0])
     root.load_system()
-    root.updateSize(root.parsePath('root'))
+    root.updatesize(root.root)
 
 else:
     root = tree()
@@ -49,18 +49,21 @@ while True:
                     print("Name is not valid")
                 else:
                     root.addChild(c, leaf(name, 'directory', False))
+                    root.updatesize(root.root)
             else:
                 text = input('')
                 content = root.getContent(c)
                 # if root.updateSize(root.parsePath('root')) - (len(text) + len(content)) <= 0:
-                if root.updateSize(root.parsePath('root')) < (len(text) + len(content)):
+                if (1001-root.root.size) < (len(text) + len(content))/4 :
                     print("1**Memory Full**")
                 else:
                     if content != '':
                         content += f'\n{text}'
                         root.updateContent(c, content)
+                        root.updatesize(root.root)
                     else:
                         root.updateContent(c, text)
+                        root.updatesize(root.root)
         else:
             print('mk\nAccess denied')
 
@@ -73,14 +76,16 @@ while True:
                     print("Name is not valid")
                 else:
                     root.addChild(c, leaf(name, parseType(name), False))
+                    root.updatesize(root.root)
             else:
                 text = input('')
-                rs = root.updateSize(root.parsePath('root'))
+                rs = (1001-root.root.size)
                 # if root.updateSize(root.parsePath('root')) - len(text) < 0:
-                if (rs+len(root.getContent(c)) < len(text)) and (len(text) > len(root.getContent(c))):
+                if (rs < len(text)) and (len(text) > len(root.getContent(c))):
                     print("2**Memory Full**")
                 else:
                     root.updateContent(c, text)
+                    root.updatesize(root.root)
         else:
             print('mkf\nAccess denied')
 
@@ -168,5 +173,25 @@ while True:
     if i == 'info':
         print(c)
 
-    root.updateSize(root.parsePath('root'))
+    # rename file
+    if i=='rename':
+        name=input('new name: ')
+        root.rename(root.root,c,name)
+        path = c.path
+    
+    # print size
+    if i=='getsize':
+        root.updatesize(root.root)
+        if c.name=='root':
+            print('size:1001 ',f'used space:{c.size} ',f'free space:{1001-c.size} ',f'used block:{round( (c.size)/4 ) }')
+        else:
+             print(f'size:{c.size}',f'used block:{round( (c.size)/4 ) }')
+
+    # search in file
+    if i=='search':
+        name=input('File name: ')
+        root.search(c,name)    
+
+    root.updatesize(root.root)
+    #root.updateSize(root.parsePath('root'))
     root.submit()

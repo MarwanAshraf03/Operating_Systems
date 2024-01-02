@@ -162,7 +162,7 @@ class tree:
             f.getID()
         if f.type == 'directory':
             for x in f.children:
-                self.updatePath(f,x)
+                self.updatePath(f,x,'o')
     # same as copy function but it asks the user if the want to overwrite the file instead of changing the name
     def cut(self, Dir, file):
         if Dir.type != 'directory':
@@ -195,17 +195,70 @@ class tree:
         file.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.size = len(file.content)
 
-    def updateSize(self, root):
-        root.size = 1001
+    # update size of desk
+    def updatesize(self,node):
+       if node.type == 'directory':
+            if len(node.children) > 0:
+                total=[]
+                for x in node.children:
+                    total.append(self.updatesize(x))    
+                    node.size=sum(total)
+                return node.size    
+            else:
+                node.size=0
+                return 0   
+       else:
+            if '.' in node.name:
+                extension = node.name.split('.')[-1]
+                if extension == 'txt':
+                      node.size=len(node.content)/4
+                      return node.size 
+                if extension in ['jpg', 'jpeg', 'png']:
+                      node.size=50
+                      return 50
+                if extension == 'mp3':
+                      node.size=50
+                      return 50
+                if extension == 'mp4':
+                      node.size=100
+                      return 100
+            else:
+                return 0
+
+
+    # rename function 
+    def rename(self,root,node,name):
+        if root==node:
+            print('you can\'t change the name of root')
+            return 
+        while node not in root.children:
+            for x in root.children:
+                self.rename(x,node,name)
         for i in root.children:
-            i.updateSize()
-            root.size -= i.size
-        return root.size
-
-
-    #TODO we need to figure out the best way to calculate sizes of files,  directories,  partitions. Note that in partitions we have to calculate the remaining disk space
-    def getSize(self, Dir):
-        pass
+            if name == i.name:
+                print('there is another directory with the same name')        
+                return   
+        node.name=name
+        self.updatePath(root,node,'o')
+        return 
+          
+    
+    
+    
+     # search function
+    def search(self,node,name):
+        if '.' in name:
+            if node.type == 'directory':
+                if len(node.children) > 0:
+                    for x in node.children:
+                        self.search(x,name)
+                else:
+                    pass
+            elif '.' in node.name:
+                if node.name==name:
+                    print(node.path)                
+        else:
+            print('you can only search about files')
 
     """
     a method that recursively generate the dictionary representation of the program 
