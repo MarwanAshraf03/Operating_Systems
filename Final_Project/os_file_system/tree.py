@@ -274,18 +274,14 @@ class tree:
     
      # search function
     def search(self,node,name):
-        if '.' in name:
-            if node.type == 'directory':
-                if len(node.children) > 0:
-                    for x in node.children:
-                        self.search(x,name)
-                else:
-                    pass
-            elif '.' in node.name:
-                if node.name==name:
-                    print(node.path)                
-        else:
-            print('you can only search about files')
+        if node.type == 'directory':
+            if len(node.children) > 0:
+                for x in node.children:
+                    self.search(x,name)
+            else:
+                pass
+        if node.name==name:
+            print(node.path)                
 
     """
     a method that recursively generate the dictionary representation of the program 
