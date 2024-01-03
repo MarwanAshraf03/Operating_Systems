@@ -115,12 +115,17 @@ class tree:
 
     def delete(self, Dir, name):
         if name in self.ls(Dir):
+            if Dir.access[0] == 's':
+                pas = input('Enter Super User Password: ')
+                if pas != 'FBI':
+                    print('Wrong password')
+                    return
             Dir.children.pop(self.ls(Dir).index(name))
             Dir.modifyTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         else:
             print('File does not exist')
             return
-        # we chekc if write permission is granted and if the file exist in the directory. if so,  we remove the file and modifyTime in the directory
+        # we check if write permission is granted and if the file exist in the directory. if so,  we remove the file and modifyTime in the directory
         # if Dir.access[1] == 'w':
         #     if name in self.ls(Dir):
         #         Dir.children.pop(self.ls(Dir).index(name))
