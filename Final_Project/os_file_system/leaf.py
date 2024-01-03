@@ -19,7 +19,7 @@ class leaf:
     def __init__(self, name=None, Type=None, partition=None, **argv):
         self.name = name
         self.type = Type
-        self.access = 'rwx'
+        self.access = '-rwx'
         self.path = 'root'
         self.partition = partition
 

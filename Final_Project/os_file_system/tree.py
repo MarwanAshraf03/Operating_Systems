@@ -22,6 +22,7 @@ class tree:
             # print("update done")
         else:
             self.root = leaf('root', 'directory', True)
+            self.root.access = 'srwx'
 
     def addChild(self, Dir, leaf):
         # check if the name exists before creating new file/folder
@@ -41,7 +42,9 @@ class tree:
 
     # check if the permissions are entered as read, write, execute. Also a user cannot write if they can't read the file
     def validAccess(self, a):
-        if len(a)>3 or a[0] not in ['r', '-'] or a[1] not in ['w', '-'] or a[2] not in ['x', '-'] or (a[1] == 'w' and a[0] == '-'):
+        # if len(a)>3 or a[0] not in ['r', '-'] or a[1] not in ['w', '-'] or a[2] not in ['x', '-'] or (a[1] == 'w' and a[0] == '-'):
+        if len(a)!=3 or a[0] not in ['r', '-'] or a[1] not in ['w', '-'] or a[2] not in ['x', '-']:
+        # if len(a)!=4 or a[0] not in ['s', '-'] or a[1] not in ['r', '-'] or a[2] not in ['w', '-'] or a[3] not in ['x', '-']:
             return False
         return True
 
@@ -82,7 +85,7 @@ class tree:
         return root
 
     def isWritable(self, f):
-        if f.access[1] == 'w':
+        if f.access[2] == 'w':
             return True
         return False
 
@@ -127,9 +130,10 @@ class tree:
 
     def changeAccess(self, file, access):
         # check again if the entered access is the way we parse it
-        if self.validAccess(access):
+        if self.validAccess(access[1:]):
             file.access = access
         else:
+            print('+'+access+'+')
             print('Wrong access')
             return
 

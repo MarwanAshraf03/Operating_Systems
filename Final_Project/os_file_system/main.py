@@ -28,7 +28,6 @@ if os.path.exists('file.json'):
     root = tree(**dict['root'][0])
     root.load_system()
     root.updatesize(root.root)
-
 else:
     root = tree()
 # we only have one main partition (linux-like)
@@ -65,7 +64,7 @@ while True:
                         root.updateContent(c, text)
                         root.updatesize(root.root)
         else:
-            print('mk\nAccess denied')
+            print('Access denied')
 
     # creates file if we're in a directory and writes content if we're in a file
     if i == 'mkf':
@@ -80,32 +79,30 @@ while True:
             else:
                 text = input('')
                 rs = (1001-root.root.size)
-                # if root.updateSize(root.parsePath('root')) - len(text) < 0:
                 if (rs < len(text)) and (len(text) > len(root.getContent(c))):
                     print("2**Memory Full**")
                 else:
                     root.updateContent(c, text)
                     root.updatesize(root.root)
         else:
-            print('mkf\nAccess denied')
+            print('Access denied')
 
     if i == 'exit':
         break
 
     # lists current directory direct children
     if i == 'ls':
-        # print(root.ls(c))
-        if root.getAccess(c)[0] == 'r':
+        if root.getAccess(c)[1] == 'r':
             print(root.ls(c))
         else:
-            print('ls\nAccess Denied')
+            print('Access Denied')
 
     # lists all the tree
     if i == 'ls -a':
-        if root.getAccess(root.parsePath('root'))[0] == 'r':
+        if (root.getAccess(root.parsePath('root'))[1] == 'r') and (root.getAccess(c)[1] == 'r'):
             root.showTree(root.root)
         else:
-            print('ls -a\nAccess Denied')
+            print('Access Denied')
 
     # if the user entered a directory or file name in our current directory, we open it. we reset path so if an error happened the parsePath method returns the last available path
     if i in root.ls(c):
@@ -129,17 +126,29 @@ while True:
     
     # changes access, if it's no more writable we take a step back
     if i == 'permission':
-        root.changeAccess(c, input('New_Access: '))
         if c.access[0] == '-':
-            path = path[:-len(c.name)-1]
-            c = root.parsePath(path)
-            path = c.path
+            access = input('New_Access: ')
+            root.changeAccess(c, '-'+access)
+        else:
+            password = input('Enter Super User Password: ')
+            if password == 'FBI':
+                access = input('New_Access: ')
+                root.changeAccess(c, '-'+access)
+            else:
+                print('Wrong Password')
+        # if c.access[0] == '-':
+        #     path = path[:-len(c.name)-1]
+        #     c = root.parsePath(path)
+        #     path = c.path
 
     # changes access, if it's no more writable we take a step back
     if i == 'sudo permission':
         password = input('Enter Super User Password: ')
         if password == 'FBI':
-            root.changeAccess(c, input('New_Access: '))
+            access = input('New_Access: ')
+            root.changeAccess(c, 's'+access)
+        else:
+            print('Wrong Password')
         # if c.access[0] == '-':
         #     path = path[:-len(c.name)-1]
         #     c = root.parsePath(path)
