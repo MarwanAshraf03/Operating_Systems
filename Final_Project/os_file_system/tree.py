@@ -152,11 +152,14 @@ class tree:
     # pastes a copied object
     def copy(self, Dir, file):
         # if where we are trying to paste is not a directory we say don't paste it
+        root = self.parsePath('root')
+        if root.totalSize-root.size < len(file.content):
+            print('No enough space')
+            return
         if Dir.type != 'directory':
-            print('operation not possible')
+            print('operation not possible in a file')
         else:
-            # if name already exist,  change to a new name and paste it
-            #TODO windows only does this to files but it merges directories if the name is the same
+            # if name already exist, change to a new name and paste it
             if file.name in self.ls(Dir):
                 file.name = 'copy_'+file.name
             self.addChild(Dir, file)
@@ -175,7 +178,7 @@ class tree:
             f.getID()
         if f.type == 'directory':
             for x in f.children:
-                self.updatePath(f,x,'o')
+                self.updatePath(f,x,'copy')
     # same as copy function but it asks the user if the want to overwrite the file instead of changing the name
     def cut(self, Dir, file):
         if Dir.type != 'directory':

@@ -53,7 +53,7 @@ while True:
                 text = input('')
                 content = root.getContent(c)
                 # if root.updateSize(root.parsePath('root')) - (len(text) + len(content)) <= 0:
-                if (1001-root.root.size) < (len(text) + len(content))/4 :
+                if (root.root.totalSize-root.root.size) < (len(text)+1) :
                     print("1**Memory Full**")
                 else:
                     if content != '':
@@ -78,7 +78,7 @@ while True:
                     root.updatesize(root.root)
             else:
                 text = input('')
-                rs = (1001-root.root.size)
+                rs = (root.root.totalSize-root.root.size)
                 if (rs < len(text)) and (len(text) > len(root.getContent(c))):
                     print("2**Memory Full**")
                 else:
@@ -156,12 +156,16 @@ while True:
 
     # we take a temporary object from our copied, cut files
     if i in ['copy', 'cut']:
-        name = input('File name: ')
-        if name not in root.ls(c):
-            print('File not found')
+        if c.type == 'directory':
+            name = input('File name: ')
+            if name not in root.ls(c):
+                print('File not found')
+            else:
+                # deep copy the file so when we change it,  we don't affect the original file
+                temp = copy.deepcopy(root.parsePath(f'{path}/{name}'))
+                option = i
         else:
-            # deep copy the file so when we change it,  we don't affect the original file
-            temp = copy.deepcopy(root.parsePath(f'{path}/{name}'))
+            temp = copy.deepcopy(c)
             option = i
 
     if i == 'paste':
@@ -192,9 +196,9 @@ while True:
     if i=='getsize':
         root.updatesize(root.root)
         if c.name=='root':
-            print('size:1001 ',f'used space:{c.size} ',f'free space:{1001-c.size} ',f'used block:{round( (c.size)/4 ) }')
+            print('size:1001 ',f'used space:{c.size} ',f'free space:{c.totalSize-c.size} ',f'used block:{c.size/c.block}')
         else:
-             print(f'size:{c.size}',f'used block:{round( (c.size)/4 ) }')
+             print(f'size:{c.size}',f'used block:{c.size / root.root.block}')
 
     # search in file
     if i=='search':

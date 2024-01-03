@@ -56,7 +56,7 @@ class leaf:
             self.partition = argv['part']
             self.size = argv['size']
         if self.partition:
-            self.totalSize = 1000
+            self.totalSize = 1001
             self.size = 0
             self.block = 13
 
@@ -107,8 +107,9 @@ class leaf:
     # overwrite the print function
     def __str__(self):
         if self.type == 'directory':
-            return f'Acess: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
+            if self.partition:
+                return f'Access: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Total size: {self.totalSize} -- used space: {self.size} -- empty space: {self.totalSize - self.size} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
+            else:
+                return f'Access: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
         elif self.type != 'directory':
-            return f'Access: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Type: {self.type} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
-        elif self.partition:
-            return f'ID: {self.Id} -- Name: {self.name} -- Size: {self.size}'
+            return f'Acccess: {self.access} -- ID: {self.Id} -- Name: {self.name} -- Size: {self.size} -- Type: {self.type} -- Created: {self.creationTime} -- Last accessed: {self.accessTime} -- Modified: {self.modifyTime}'
