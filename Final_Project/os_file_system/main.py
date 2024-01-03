@@ -193,6 +193,5 @@ while True:
         root.search(c,name)    
 
     root.updatesize(root.root)
-    # 
     #root.updateSize(root.parsePath('root'))
     root.submit()
