@@ -24,7 +24,6 @@ class leaf:
         self.partition = partition
 
         # create a unique id for each file in range of 1 to 9000
-        #TODO maybe change namespace to a static var
         self.getID()
 
         self.creationTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -57,6 +56,7 @@ class leaf:
             self.partition = argv['part']
             self.size = argv['size']
         if self.partition:
+            self.totalSize = 1000
             self.size = 0
             self.block = 13
 

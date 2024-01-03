@@ -105,8 +105,12 @@ class tree:
             for x in node.children:
                 self.writeTree(x)
         else:
-            with open(node.path, 'w') as f:
-                f.write(node.content)
+            if node.type == 'text file':
+                with open(node.path, 'w') as f:
+                    f.write(node.content)
+            else:
+                with open(node.path, 'w') as f:
+                    f.write('')
 
 
     def delete(self, Dir, name):
@@ -212,22 +216,24 @@ class tree:
                 node.size=0
                 return 0   
        else:
-            if '.' in node.name:
-                extension = node.name.split('.')[-1]
-                if extension == 'txt':
-                      node.size=len(node.content)/4
-                      return node.size 
-                if extension in ['jpg', 'jpeg', 'png']:
-                      node.size=50
-                      return 50
-                if extension == 'mp3':
-                      node.size=50
-                      return 50
-                if extension == 'mp4':
-                      node.size=100
-                      return 100
-            else:
-                return 0
+            # if '.' in node.name:
+            #     extension = node.name.split('.')[-1]
+            #     if extension == 'txt':
+            #           node.size=len(node.content)/4
+            #           return node.size 
+            #     if extension in ['jpg', 'jpeg', 'png']:
+            #           node.size=50
+            #           return 50
+            #     if extension == 'mp3':
+            #           node.size=50
+            #           return 50
+            #     if extension == 'mp4':
+            #           node.size=100
+            #           return 100
+            # else:
+            #     return 0
+            node.size = len(node.content)
+            return node.size
 
 
     # rename function 
@@ -241,10 +247,13 @@ class tree:
         
         for x in root.children:
             if x.path == node.path:
-                for i in root.children:
-                    if name == i.name:
-                        print('there is another directory with the same name')        
-                        return   
+                # for i in root.children:
+                #     if name == i.name:
+                #         print('there is another directory with the same name')        
+                #         return   
+                if name in self.ls(root):
+                    print('there is another directory with the same name')        
+                    return
                 node.name=name
                 self.updatePath(root,node,'o')
                 return
