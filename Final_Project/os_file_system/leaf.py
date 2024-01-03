@@ -88,7 +88,7 @@ class leaf:
                     "path": self.path,
                     "content": self.content,
                     "part": self.partition,
-                    "used space": self.size
+                    "size": self.size
                 }
         elif self.type == 'directory':
             return {"Access": f"{self.access}",
@@ -101,7 +101,7 @@ class leaf:
                     "path": self.path,
                     "part": self.partition,
                     "children": [],
-                    "used space": self.size,
+                    "size": self.size,
                 }
 
     # overwrite the print function

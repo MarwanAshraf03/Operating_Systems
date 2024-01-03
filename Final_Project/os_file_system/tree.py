@@ -228,20 +228,26 @@ class tree:
 
     # rename function 
     def rename(self,root,node,name):
+        if name=='root':
+            print('you can\'t use root as a name')
+            return
         if root==node:
             print('you can\'t change the name of root')
-            return 
-        while node not in root.children:
-            for x in root.children:
-                self.rename(x,node,name)
-        for i in root.children:
-            if name == i.name:
-                print('there is another directory with the same name')        
-                return   
-        node.name=name
-        self.updatePath(root,node,'o')
-        return 
-          
+            return
+        
+        for x in root.children:
+            if x.path == node.path:
+                for i in root.children:
+                    if name == i.name:
+                        print('there is another directory with the same name')        
+                        return   
+                node.name=name
+                self.updatePath(root,node,'o')
+                return
+            else:
+                if x.path in node.path:
+                    self.rename(x,node,name) 
+
     
     
     
