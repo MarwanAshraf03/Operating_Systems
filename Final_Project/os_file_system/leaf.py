@@ -41,6 +41,7 @@ class leaf:
         This means that if argv is present use its values to initiate
         the leaf thus override those past assignments
         """
+        # if argv is present use it to override the past assignments
         if argv:
             self.name = argv['Name']
             self.access = argv['Access']
@@ -77,6 +78,7 @@ class leaf:
     This is a function to change the object to a dictionary representation
     """
     def dict(self):
+        # if the leaf is a file
         if not self.partition and self.type != 'directory':
             return {"Access": f"{self.access}",
                     "ID": self.Id,
@@ -90,6 +92,7 @@ class leaf:
                     "part": self.partition,
                     "size": self.size
                 }
+        # if the leaf is a directory
         elif self.type == 'directory':
             return {"Access": f"{self.access}",
                     "ID": self.Id,

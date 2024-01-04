@@ -18,8 +18,10 @@ class tree:
     using a dictionary representation
     """
     def __init__(self, **dict):
+        # if the dict is present use it to initialize the root
         if dict:
             self.root = leaf(**dict)
+        # if the dict is not present initialize the root normally
         else:
             # we set the root of the tree and give it name, type, and the boolean set to true meaning it is a partition not a normal directory
             self.root = leaf('root', 'directory', True)
@@ -154,7 +156,6 @@ class tree:
         if self.validAccess(access[1:]):
             file.access = access
         else:
-            print('+'+access+'+')
             print('Wrong access')
             return
 
@@ -302,11 +303,10 @@ class tree:
             else:
                 if x.path in node.path:
                     self.rename(x,node,name) 
-
     
-    
-    
-     # search function
+    """
+    search function
+    """
     def search(self,node,name):
         if node.type == 'directory':
             if len(node.children) > 0:
@@ -321,23 +321,38 @@ class tree:
     a method that recursively generate the dictionary representation of the program 
     """
     def dict(self, node=None):
+        # the initial empty dictionary
         dictt = {}
+        # check if the node of dict() is none then we create the root as a key and list of its information and children
         if node == None:
+            # create list of root's children
             dictt[self.root.name] = self.root.children.copy()
+            # add root's information at the 0 index
             dictt[self.root.name].insert(0, self.root.dict())
+            # iterates over root's children starting from index 1 to avoid iteration over root's information
             for i in range(1, len(dictt[self.root.name])):
+                # if this child is directory call the dict() method on it
                 if dictt[self.root.name][i].type == 'directory':
                     dictt[self.root.name][i] = self.dict(dictt[self.root.name][i])
+                # if this child is file add its string as a child to this index
                 else:
                     dictt[self.root.name][i] = json.dumps(dictt[self.root.name][i].dict())
+        # if the node of dict() is not none then we create this node as a key and list of its information and children
         else:
+            # create list of node's children
             dictt[node.name] = node.children.copy()
+            # add node's information at the 0 index
             dictt[node.name].insert(0, node.dict())
+            # iterates over node's children starting from index 1 to avoid iteration over node's information
             for i in range(1, len(dictt[node.name])):
+                # if this child is directory call the dict() method on it
                 if dictt[node.name][i].type == 'directory':
                     dictt[node.name][i] = self.dict(dictt[node.name][i])
+                # if this child is file add its string as a child to this index
                 else:
                     dictt[node.name][i] = json.dumps(dictt[node.name][i].dict())
+        # return the dictionary and this is the system's dictionary representation used to retrieve the last state
+        #   of the code
         return dictt
 
     """
@@ -345,6 +360,7 @@ class tree:
     in a json format
     """
     def submit(self):
+        # writes the dictionary of the system to the file.json
         with open('file.json', 'w', encoding='utf-8') as f:
             f.write(json.dumps(self.dict()))
 
@@ -353,6 +369,7 @@ class tree:
     in a string form
     """
     def __str__(self):
+        # returns string of the dictionary of the system
         return str(self.dict())
 
     """
@@ -361,8 +378,10 @@ class tree:
     has root's information
     """
     def load_system(self):
+        # retrieve the dictionary from 'file.json'
         with open('file.json', 'r', encoding='utf-8') as f:
             dict = json.load(f)
+        # calls the self.load method using the root as a path and the list of root
         self.load('root', dict['root'])        
     
     """
@@ -371,10 +390,18 @@ class tree:
     and if it finds a directory it creates it then use its information to build it.
     """
     def load(self, path, lst):
+        # a loop to iterate through the list of items 
         for i in range(1, len(lst)):
+            # if the list item is string then it is a file so add it to the node as a file child
             if type(lst[i]).__name__ == 'str':
+                # create a new leaf using the variable expansion to create the leaf with existing leaf's information
                 self.addChild(self.parsePath(path), leaf(**json.loads(lst[i])))
+            # if the list item is not a string then it is a directory so add it to the node as a folder child
+            #   then call the self.load method on it
             else:
+                # create a new leaf using the variable expansion to create the leaf with existing leaf's information
                 nleaf = leaf(**lst[i][list(lst[i].keys())[0]][0])
+                # add the leaf to the current node as a child
                 self.addChild(self.parsePath(path), nleaf)
+                # call the self.load method using this leaf's information
                 self.load(nleaf.path, lst[i][list(lst[i].keys())[0]])
