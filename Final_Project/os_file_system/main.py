@@ -9,6 +9,7 @@ import shutil
 import copy
 from tree import tree
 from leaf import leaf
+import re
 
 # Get the file type from its extension
 def parseType(name):
@@ -37,12 +38,33 @@ if os.path.exists('file.json'):
 else:
     # initialize the root tree without any thing
     root = tree()
+
+commands = {
+    'mk':"if we're currently in a directory, it makes a new directory in it then asks for the name after you press ENTER. if we're in a file it appends new content to the file. (write mk, press enter then it will ask for the directory name or the file contnet, file content has no prompt)",
+    'mkf':"if we're currently in a directory, it makes a new file in it then asks for the name after you press ENTER. if we're in a file it replaces the old file content with new one. (write mkf, press enter then it will ask for the file name or the file contnet, file content has no prompt)",
+    'exit':"will stop the program (just write exit)",
+    'ls':"if we're currently in a directory, it shows it's children's names. if we're currently in a file, it reads the file content (just type ls)",
+    'ls -a':"shows the whole tree in a (just type ls -a)",
+    '..':"takes you back to the parent directory of the current file/folder (just type ..)",
+    'delete':"deletes a file/folder from your current directory. will ignore if we're currently in a file (type delete, press ENTER, it will ask for the name of the file to delete. if the file was created by the super user it will ask for a password which is FBI)",
+    'copy':"if we're currently in a file, it will copy that file. if we're currently in a directory, it will ask for the name of the file/folder to copy (type copy, press ENTER, if it's a file it will copy it if it's a directory it will ask for the name of the file/folder to copy)",
+    'cut':"if we're currently in a file, it mark that file to be moved. if we're currently in a directory, it will ask for the name of the file/folder to move (type cut, press ENTER, if it's a file it will makr it to move if it's a directory it will ask for the name of the file/folder to move)",
+    'paste':"pastes the copied/moved object to the current directory (enter the directory where you wish to paste your file/folder, type paste)",
+    'apply':"writes the tree to the real OS (just type apply)",
+    'info':"returns some information about the file (enter the file/folder, type info)",
+    'rename':"renames a file/folder (enter the file/folder you want to rename, type rename then press ENTER, type the new name)",
+    'getsize':"returns size-related info about the file including blocks used (enter the file/folder, type getsize)",
+    'search':"searches a directory for a give search (enter the directory you want to search in, type search then ENTER, enter the name of the search)"
+}
+
 # we only have one main partition (linux-like)
 path = 'root'
 # to track if the last operation was copy or cut
 option = ''
 # c will be the directory we're in
 c = root.parsePath(path)
+print('Type Help to open the list of commands')
+print('Type Help + command to get further information about a command including how it works ')
 while True:
     print(path + '>>', end=' ')
     i = input()
@@ -54,7 +76,7 @@ while True:
         if root.isWritable(c):
             if c.type == 'directory':
                 name = input('Name: ')
-                if name.strip() == '':
+                if name.strip() == '' or name in commands.keys():
                     print("Name is not valid")
                 else:
                     root.addChild(c, leaf(name, 'directory', False))
@@ -87,7 +109,7 @@ while True:
         if root.isWritable(c):
             if c.type == 'directory':
                 name = input('Name: ')
-                if name.strip() == '':
+                if name.strip() == ''  or name in commands.keys():
                     print("Name is not valid")
                 else:
                     root.addChild(c, leaf(name, parseType(name), False))
@@ -146,7 +168,7 @@ while True:
         path = c.path
 
     # deletes a provided file name from a the current directory
-    if i == 'delete':
+    if i == 'delete' and c.type == 'directory':
         if root.isWritable(c):
             name = input("Name: ")
             root.delete(c, name)
@@ -262,7 +284,17 @@ while True:
     if i=='search':
         name=input('File name: ')
         # send the file or folder name to search function in tree class
-        root.search(c,name)    
+        root.search(c,name)   
+
+    if i == 'Help' :
+        print('\n'.join(commands.keys()))
+    
+    if re.match(r'Help ([a-zA-Z]+)+',i):
+        command = i[i.find(' ')+1:]
+        if command in commands.keys():
+            print(f'{command}: {commands[command]}')
+        else:
+            print('unkown command')
 
     root.updatesize(root.root)
     #root.updateSize(root.parsePath('root'))
