@@ -291,12 +291,14 @@ class tree:
         if root==node:
             print('you can\'t change the name of root')
             return
-
+        # here we use recursive way to get the names of folder or directory in same level to chek that we will not duplicate the name
         for x in root.children:
             if x.path == node.path:
+                # if there is another dir or file with the same name we stop the function
                 if name in self.ls(root):
                     print('there is another directory with the same name')        
                     return
+                # if not we rename the file and then update the path of that
                 node.name=name
                 self.updatePath(root,node,'o')
                 return
@@ -308,12 +310,14 @@ class tree:
     search function
     """
     def search(self,node,name):
+        # we take the current node and chek if it's directory and has children we will search in the child of it 
         if node.type == 'directory':
             if len(node.children) > 0:
                 for x in node.children:
                     self.search(x,name)
             else:
                 pass
+        # if not we will check if it's have same name we search about 
         if node.name==name:
             print(node.path)                
 

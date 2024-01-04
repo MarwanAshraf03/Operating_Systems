@@ -240,23 +240,28 @@ while True:
     if i == 'info':
         print(c)
 
-    # rename file
+    # rename file or folder
     if i=='rename':
         name=input('new name: ')
+        #send the root node , current node and new name to rename function in tree class
         root.rename(root.root,c,name)
+        #change the path of current node
         path = c.path
     
     # print size
     if i=='getsize':
         root.updatesize(root.root)
+        # if current node is root print information about the root node because it's have more information like used space , free space ,used block etc
         if c.name=='root':
             print('size:1001 ',f'used space:{c.size} ',f'free space:{c.totalSize-c.size} ',f'used block:{c.size/c.block}')
         else:
+        # if current node not root print the size of it and number of used block
              print(f'size:{c.size}',f'used block:{c.size / root.root.block}')
 
     # search in file
     if i=='search':
         name=input('File name: ')
+        # send the file or folder name to search function in tree class
         root.search(c,name)    
 
     root.updatesize(root.root)
