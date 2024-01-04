@@ -176,8 +176,8 @@ class tree:
         if Dir.type != 'directory':
             print('operation not possible in a file')
         else:
-            # if name already exist, change to a new name (copy_old name) and paste it
-            if file.name in self.ls(Dir):
+            # if name already exist, change to a new name (copy_old name), keep doing that until it's unique and paste it
+            while file.name in self.ls(Dir):
                 file.name = 'copy_'+file.name
             # paste the copy
             self.addChild(Dir, file)
@@ -219,6 +219,9 @@ class tree:
         if Dir.type != 'directory':
             print('operation not possible')
         else:
+            if Dir.path == file.path[:file.path.rfind('/')]:
+                print("can't move to the same directory")
+                return
             # if the file name exist, ask the user if they want to overwrite the old file
             if file.name in self.ls(Dir):
                 r = input('File already exist,  overwrite? (Y|N): ')

@@ -13,6 +13,7 @@ import re
 
 # Get the file type from its extension
 def parseType(name):
+    # locate the extension to set the file type
     extension = name[name.rfind('.')+1:]
     if extension == 'txt':
         return 'text file'
@@ -39,6 +40,7 @@ else:
     # initialize the root tree without any thing
     root = tree()
 
+# a list of commands so we can avoid naming a file or a folder with one of them and to show the inforamtion about them
 commands = {
     'mk':"if we're currently in a directory, it makes a new directory in it then asks for the name after you press ENTER. if we're in a file it appends new content to the file. (write mk, press enter then it will ask for the directory name or the file contnet, file content has no prompt)",
     'mkf':"if we're currently in a directory, it makes a new file in it then asks for the name after you press ENTER. if we're in a file it replaces the old file content with new one. (write mkf, press enter then it will ask for the file name or the file contnet, file content has no prompt)",
@@ -67,6 +69,7 @@ print('Type Help to open the list of commands')
 print('Type Help + command to get further information about a command including how it works ')
 while True:
     print(path + '>>', end=' ')
+    # i is the command the user enters
     i = input()
     """
     creates directory if we're in a directory and writes content if we're in a file
@@ -74,18 +77,24 @@ while True:
     if i == 'mk':
         # if the folder has the write access to it then go ahead
         if root.isWritable(c):
+            # if it's a directory, add a new folder in it
             if c.type == 'directory':
+                # ask for the new folder name
                 name = input('Name: ')
+                # check that it's not empty and is not in the list of commands
                 if name.strip() == '' or name in commands.keys():
                     print("Name is not valid")
                 else:
+                    # add a new node and selt partition to False as it's just a directory
                     root.addChild(c, leaf(name, 'directory', False))
                     root.updatesize(root.root)
+            # if it's a file append in its content
             else:
                 # prompt the user to write the content of the file
                 text = input('')
+                # get old content
                 content = root.getContent(c)
-                # TODO: explain the size management
+                # check if the new content is larger than the free space (we add one for the new line character)
                 if (root.root.totalSize-root.root.size) < (len(text)+1) :
                     print("**Memory Full**")
                 else:
@@ -93,10 +102,12 @@ while True:
                     if content != '':
                         content += f'\n{text}'
                         root.updateContent(c, content)
+                        # update file size
                         root.updatesize(root.root)
                     # if the content is empty they add the text to the file without appending the old content
                     else:
                         root.updateContent(c, text)
+                        # update file size
                         root.updatesize(root.root)
         # if the folder is not writable
         else:
@@ -118,8 +129,9 @@ while True:
             else:
                 # prompt the user to type the file content
                 text = input('')
-                # TODO: explain the size management
+                # available space
                 rs = (root.root.totalSize-root.root.size)
+                # if new content is bigger than free space don't update
                 if (rs < len(text)) and (len(text) > len(root.getContent(c))):
                     print("**Memory Full**")
                 # update the content of the file
@@ -157,7 +169,9 @@ while True:
 
     # if the user entered a directory or file name in our current directory, we open it. we reset path so if an error happened the parsePath method returns the last available path
     if i in root.ls(c):
+        # change the path
         path+=f'/{i}'
+        # get the node from the path
         c = root.parsePath(path)
         path = c.path
 
@@ -170,6 +184,7 @@ while True:
     # deletes a provided file name from a the current directory
     if i == 'delete' and c.type == 'directory':
         if root.isWritable(c):
+            # take file name as an input
             name = input("Name: ")
             root.delete(c, name)
         else:
@@ -241,9 +256,11 @@ while True:
                 temp = copy.deepcopy(root.parsePath(f'{path}/{name}'))
                 option = i
         else:
+            # copy the node not just get its address
             temp = copy.deepcopy(c)
             option = i
 
+    # paste the copied or moved file
     if i == 'paste':
         if option == 'copy':
             root.copy(c, temp)
@@ -252,7 +269,9 @@ while True:
 
     # adds files to the real os and overwrites the last written tree
     if i == 'apply':
+        # check if it exist before
         try:
+            # remove the old files
             shutil.rmtree('root')
         except Exception as e:
             pass
@@ -297,5 +316,4 @@ while True:
             print('unkown command')
 
     root.updatesize(root.root)
-    #root.updateSize(root.parsePath('root'))
     root.submit()
